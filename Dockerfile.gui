@@ -1,0 +1,51 @@
+### ######
+### download 
+###
+FROM alpine:3.19.1 as download
+RUN set -eux && apk upgrade --no-cache && true
+
+WORKDIR /
+RUN set -eux \
+    && apk add --no-cache \
+        git \
+    && rm -rf /var/cache/apk/* \
+    && rm -rf /tmp/* \
+    && true
+
+WORKDIR /ergogen-gui
+RUN set -eux \
+    && git clone -b myfork https://github.com/vigilancer/ergogen-gui.git ./ \
+    && true
+
+
+### ######
+### build
+###
+FROM node:lts-alpine3.19 as build
+RUN set -eux && apk upgrade --no-cache && true
+
+WORKDIR /ergogen-gui
+
+COPY --from=download /ergogen-gui ./
+
+RUN set -eux \
+    && yarn install \
+    && true
+
+
+### ######
+### run
+###
+FROM node:lts-alpine3.19 as run
+
+RUN set -eux && apk upgrade --no-cache && true
+
+WORKDIR /ergogen-gui
+
+COPY --from=build /ergogen-gui ./
+
+VOLUME "./node_modules/ergogen/src/footprints"
+
+EXPOSE 3000
+
+ENTRYPOINT ["yarn", "start"]
