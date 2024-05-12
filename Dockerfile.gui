@@ -2,35 +2,23 @@
 ### download 
 ###
 FROM alpine:3.19.1 as download
-RUN set -eux && apk upgrade --no-cache && true
 
-WORKDIR /
-RUN set -eux \
-    && apk add --no-cache \
-        git \
-    && rm -rf /var/cache/apk/* \
-    && rm -rf /tmp/* \
-    && true
+WORKDIR /tmp
 
-WORKDIR /ergogen-gui
-RUN set -eux \
-    && git clone -b myfork https://github.com/vigilancer/ergogen-gui.git ./ \
-    && true
+RUN apk add --no-cache git \
+    && git clone -b myfork https://github.com/vigilancer/ergogen-gui.git
 
 
 ### ######
 ### build
 ###
 FROM node:lts-alpine3.19 as build
-RUN set -eux && apk upgrade --no-cache && true
+
+COPY --from=download /tmp/ergogen-gui /ergogen-gui
 
 WORKDIR /ergogen-gui
 
-COPY --from=download /ergogen-gui ./
-
-RUN set -eux \
-    && yarn install \
-    && true
+RUN yarn install 
 
 
 ### ######
@@ -38,12 +26,11 @@ RUN set -eux \
 ###
 FROM node:lts-alpine3.19 as run
 
-RUN set -eux && apk upgrade --no-cache && true
+COPY --from=download /tmp/ergogen-gui /ergogen-gui
 
 WORKDIR /ergogen-gui
 
-COPY --from=build /ergogen-gui ./
-
+# to overwrite footprints
 VOLUME "./node_modules/ergogen/src/footprints"
 
 EXPOSE 3000

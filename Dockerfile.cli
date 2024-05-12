@@ -1,63 +1,16 @@
-### ######
-### download 
 ###
-FROM alpine:3.19.1 as download
-RUN set -eux && apk upgrade --no-cache && true
-
-WORKDIR /
+FROM node:lts-alpine3.19 as run
 
 RUN set -eux \
-    && apk add --no-cache \
-        git \
-    && rm -rf /var/cache/apk/* \
-    && rm -rf /tmp/* \
-    && true
-
-WORKDIR /ergogen
-
-# ARG ERGOGEN_VERSION_TAG=v4.1.0
-# ARG ERGOGEN_REPO_URL=https://github.com/ergogen/ergogen.git
-
-ARG ERGOGEN_VERSION_TAG=myfork
-ARG ERGOGEN_REPO_URL=https://github.com/vigilancer/ergogen.git
-
-RUN set -eux \
-    && git clone -b ${ERGOGEN_VERSION_TAG} ${ERGOGEN_REPO_URL} . \
-    && true
-
-
-### ######
-### build
-###
-FROM node:lts-alpine3.19 as build
-RUN set -eux && apk upgrade --no-cache && true
-
-WORKDIR /
-RUN set -eux \
-    && apk add --no-cache \
-        git \
-    && rm -rf /var/cache/apk/* \
-    && rm -rf /tmp/* \
-    && true
-
-WORKDIR /ergogen
-
-# COPY --from=download /ergogen ./
-
-# RUN npm install ./
-
-
-### ######
-### run
-###
-FROM build as run
-
-# WORKDIR /work
-# RUN mkdir input/ output/
+    && apk add --no-cache git \
+    # installs right from tarball from the github. still needs 'git' tho.
+    && npm install -g --save "https://github.com/vigilancer/ergogen/tarball/myfork" \
+    # saves around 23MB
+    && rm -rf /root/.npm
 
 VOLUME ["/work/output", "/work/input"]
+WORKDIR /work
 
-ENTRYPOINT ["ergogen", "--output", "/work/output"]
+ENTRYPOINT ["ergogen"]
 
-CMD ["--help"]
-
+CMD ["/work/input/keyboard.yaml", "--clean", "--debug", "--output=/work/output"]
