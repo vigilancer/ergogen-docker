@@ -92,10 +92,16 @@ But one can find other use for different scenarios for this tool.
   $(basename "$0") -i ./footprints
 
 
+  Download vanilla footprints (index.js will be downloaded from ergogen repo and will not be generated)
+  into default 'footprints' in current directory. 'footprints' will be created if missing.
+
+  $(basename "$0")
+  
+
   Download vanilla footprints (index.js will be downloaded from ergogen repo and will not be generated):
 
   $(basename "$0") -o ./footprints
-  
+
 
   Use only locally stored footprints:
 
@@ -198,9 +204,8 @@ do_process_source() {
     [ ${#src_arr[@]} -gt 1 ] && path="${src_arr[1]}"
 
     if $(git ls-remote -q --exit-code "$url" >/dev/null); then
-      echo "git remote"
-      echo "url: $url"
-      echo "path: $path"
+      m "url: $url"
+      m "path: $path"
 
       local tmpdir=$(mktemp -d -t ergogen)
       git clone "$url" "$tmpdir/"
@@ -222,7 +227,7 @@ __process_git_src() {
 }
 
 main() {
-  local output=""
+  local output="footprints"
   local skip_vanilla=0
   local dont_clear=0
   local update_index_only=0
@@ -253,7 +258,11 @@ main() {
   m "Update index only: $t"
   m ""
 
-  [ -d "$output" ] || err "Dir $output does not exist" 33
+  [ -d "$output" ] || {
+    m "Creating $output ..."
+    mkdir "$output"
+    m "Done creating"
+  }
 
   output=$(cd "$output"; pwd)
 
