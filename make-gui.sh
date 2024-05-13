@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -eu -o pipefail
+[ -z ${DEBUG-} ] || set -x
+
 m() {
   ## Usage# m "$MESSAGE"
   printf "[- INFO --- ] $1\n"
