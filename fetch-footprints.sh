@@ -134,51 +134,152 @@ do_error() {
   exit code
 }
 
+validate_args() {
+  local output="$1"; shift
+  local skip_vanilla="$1"; shift
+  local dont_clear="$1"; shift
+  local sources="$1"; shift
+  local update_index_only="$1"; shift
+
+  if [ $update_index_only -eq 1 ]; then
+    [ ! -z $output ] || err "DIR is not set for -i" 11
+  fi
+  # TODO
+}
+
+do_update_index() {
+  local dir="$1"
+  local index="$dir/index.js"
+  m "Updating $index ..."
+
+  # local file_names=$(ls -1 | grep '.js$' | perl -pe 's/.js//')
+
+  [ -f "$index" ] && rm "$index"
+
+  echo "module.exports = {" >> "$index"
+
+  for f in "$dir/"*; do
+    [ -f "$f" ] || continue
+    local s=$(basename $f | perl -pe 's/.js//')
+    [ "$s" != "index" ] || continue
+    echo "    $s: require('./$s')," >> "$index"
+  done
+
+  echo "}" >> "$index"
+  m "Done updating"
+}
+
+do_process_source() {
+  local src="$1"; shift
+  local out="$1"; shift
+
+  m "Processing $src into $out ..."
+
+  # process local dir
+  if [ -d "$src" ]; then
+    echo "local dir"
+    # cp "$src/*.js" "$out/"
+    # return
+  else
+    local src_arr=()
+    IFS='#' read -ra src_arr <<< "$src"
+
+    local url="${src_arr[0]}" 
+    local dir="/"
+    [ ${#src_arr[@]} -gt 1 ] && dir="${src_arr[1]}"
+
+    if $(git ls-remote -q --exit-code "$url" >/dev/null); then
+      echo "git remote"
+      echo "url: $url"
+      echo "path: $path"
+    fi
+  fi
 
 
+  m "Done processing"
+}
+
+__process_git_src() {
+  local repo="$1"; shift
+  local path="$1"; shift
+}
 
 main() {
   local output
   local skip_vanilla=0
   local dont_clear=0
-  local sources=()
+  local sources=( "https://github.com/ergogen/ergogen.git#src/footprints" )
+  local update_index_only=0
 
   while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -h) echo help;;
+        -i) update_index_only=1; output="$2"; shift ;;
+        -h) echo "$usage"; exit 0;;
         -o) output="$2"; shift ;;
         --skip-vanilla) skip_vanilla=1 ;;
         --dont-clear) dont_clear=1 ;;
         # *) do_error "Unknown parameter passed: $1" 127 ;;
         *) {
             # [[ "$1" == *"github.com/ergogen/ergogen"* ]] && skip_vanilla=1 ;;
-            [[ "$1" == *"github.com/ergogen/ergogen"* ]] && skip_vanilla=1;
             sources+=( "$1" ); 
            } ;;
     esac
     shift
   done
 
-  [ skip_vanilla ] || sources+=( "https://github.com/ergogen/ergogen.git#src/footprints" )
 
   m ""
   m "Output dir: $output"
   m ""
-  local t=$([ $skip_vanilla ] && echo "True" || echo "False")
+  local t=$([ $skip_vanilla -eq 1 ] && echo "True" || echo "False")
   m "Skipping vanilla: $t"
-  local t=$([ $dont_clear ] && echo "True" || echo "False")
+  local t=$([ $dont_clear -eq 1 ] && echo "True" || echo "False")
   m "Don't clear output dir: $t"
+  local t=$([ $update_index_only -eq 1 ] && echo "True" || echo "False" )
+  m "Update index only: $t"
+  m ""
+
+  validate_args "$output" "$skip_vanilla" "$dont_clear" "$sources" "$update_index_only"
+
 
   # todo: 
   # validate sources
   # remove invalid
   # print invalid list
 
+  [ $skip_vanilla -eq 1 ] && sources=${sources[@]:1}
+
   m ""
   m "Using these sources:"
   for s in ${sources[@]}; do
     m "$s"
   done
+
+  if [ $update_index_only -eq 1 ]; then
+    do_update_index $output
+    exit 0
+  fi
+
+  if [ $dont_clear -eq 0 ]; then
+    # rm -rf "$output/*"
+    :
+  fi
+
+  for src in ${sources[@]}; do
+    do_process_source "$src" "$output"
+  done
+
+
+  # update indexes if one of these is true:
+  # = --skip-vanilla and size(sources) > 0
+  # = no --skip-vanilla and size(sources) > 1
+  if [ $skip_vanilla -eq 1 ] && [ ${#sources[@]} -gt 0 ]; then
+    do_update_index
+  fi
+  if [ $skip_vanilla -eq 0 ] && [ ${#sources[@]} -gt 1 ]; then
+    do_update_index
+  fi
+
 }
 
 main "$@"
