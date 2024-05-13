@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 m() {
   ## Usage# m "$MESSAGE"
   printf "[- INFO --- ] $1\n"
