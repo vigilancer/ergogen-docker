@@ -16,6 +16,9 @@ trap finish_normal EXIT
 
 usage="
 
+Footprints downloader.
+Fetches footprint files from different sources into one local directory.
+
 $(basename "$0") -h
 
 $(basename "$0") -i DIR
@@ -26,6 +29,16 @@ $(basename "$0") -o OUTOUT [--skip-vanilla] [--dont-clear] [SOURCE .. ]
 
 
 help="
+
+Tool can fetch footprints from git repo, local directory or from official ergogen github repo.
+It will download vanilla footprints from ergogen repo unless --skip-vanulla is specified.
+Also it will update index.js to include all acquired footprints.
+
+Original purpose of this tool was to simplify running ergogen in Docker when 'footprints' folder
+mount into container running cli ergogen so it would be possible to use custom not vanilla footprints
+that comes bundled with ergogen package.
+
+But one can find other use for different scenarios for this tool.
 
   -h              - Help (short)
 
@@ -50,7 +63,7 @@ help="
 
   SOURCE            List of sources where to acquire footprints.
                     If no SOURCE are specified only vanilla ergogen footprints will be downloaded.
-                    If no SOURCE are specified and --skip-vanilla is set nothing will be downloaded and --dont-clear will be ignored.
+                    If no SOURCE are specified and --skip-vanilla is specified nothing will be downloaded and --dont-clear will be ignored.
                     If no SOURCE are specified index.js will not be updated because vanilla footprints folder already contains valid one.
 
   When multiple SOURCEs are specified they will be merged into single OUTPUT directory.
@@ -69,12 +82,6 @@ help="
     Additionally tool supports syntax to specify exact directory in repo where to look for footprints.
     To specify directory add # and folder path relative to root of repo (for example '#src/footprints' for vanilla ergogen repo).
     See EXAMPLES below.
-
-  ergogen git repo
-  - By default tool will download vanilla footprints from default branch of official ergogen repo (unless --skip-vanila is set).
-    If specified --skip-vanilla original ergogen repo will be ignored and no footprints will be fetched from it.
-    See EXAMPLES below.
-
 
 
   EXAMPLES:
@@ -149,17 +156,12 @@ validate_args() {
     err "Output should be set with -o" 22
   fi
 
-
-
-  # TODO
 }
 
 do_update_index() {
   local dir="$1"
   local index="$dir/index.js"
   m "Updating index $index ..."
-
-  # local file_names=$(ls -1 | grep '.js$' | perl -pe 's/.js//')
 
   [ -f "$index" ] && rm "$index"
 
@@ -234,14 +236,10 @@ main() {
         --skip-vanilla) skip_vanilla=1 ;;
         --dont-clear) dont_clear=1 ;;
         # *) do_error "Unknown parameter passed: $1" 127 ;;
-        *) {
-            # [[ "$1" == *"github.com/ergogen/ergogen"* ]] && skip_vanilla=1 ;;
-            sources+=( "$1" ); 
-           } ;;
+        *) sources+=( "$1" ) ;;
     esac
     shift
   done
-
 
   m ""
   m "Output dir: $output"
@@ -264,7 +262,6 @@ main() {
   [ $skip_vanilla -eq 1 ] && tmp=${sources[@]:1}
   [ $skip_vanilla -eq 0 ] && tmp=${sources[@]}
   sources=($tmp)
-
 
   m ""
   m "Using these sources:"
@@ -289,6 +286,7 @@ main() {
   done
 
   # update indexes if one of these is true:
+  # (both conditions make sure that at least one custom source is specified)
   # = --skip-vanilla and size(sources) > 0
   # = no --skip-vanilla and size(sources) > 1
   if [ $skip_vanilla -eq 1 ] && [ ${#sources[@]} -gt 0 ]; then
