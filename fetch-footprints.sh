@@ -37,6 +37,7 @@ Also it will update index.js to include all acquired footprints.
 Original purpose of this tool was to simplify running ergogen in Docker when 'footprints' folder
 mount into container running cli ergogen so it would be possible to use custom not vanilla footprints
 that comes bundled with ergogen package.
+Same scenario is possible with ergogen-gui running in Docker to preview custom footprints.
 
 But one can find other use for different scenarios for this tool.
 
