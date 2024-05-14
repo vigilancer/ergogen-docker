@@ -19,7 +19,7 @@ err() {
 }
 
 ergogen_build() {
-    local target="${1:-run}"; shift
+    local target="${1:-run}"
     docker build \
         --target "${target}"  \
         -t ergogen-gui:latest \
