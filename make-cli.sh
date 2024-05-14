@@ -31,15 +31,15 @@ ergogen_build() {
 ergogen_run() {
     local args="${1:-}"
     local cmd="
-    docker run \
-        -it \
-        --rm \
-        --init \
-        --name ergogen-cli \
-        -v $(pwd)/footprints:/usr/local/lib/node_modules/ergogen/src/footprints \
-        -v $(pwd)/input:/work/input \
-        -v $(pwd)/output:/work/output \
-        ergogen-cli:latest
+        docker run \
+            -it \
+            --rm \
+            --init \
+            --name ergogen-cli \
+            -v $(pwd)/footprints:/usr/local/lib/node_modules/ergogen/src/footprints \
+            -v $(pwd)/input:/work/input \
+            -v $(pwd)/output:/work/output \
+            ergogen-cli:latest
     "
 
     [ ! -z "$args" ] && cmd="$cmd $args"

@@ -5,12 +5,14 @@ RUN set -eux \
     && apk add --no-cache git \
     # installs right from tarball from the github. still needs 'git' tho.
     && npm install -g --save "https://github.com/vigilancer/ergogen/tarball/myfork" \
+    # needed to rebuild ergogen dist with new footprints
+    && npm install -g --save rollup @rollup/plugin-json @rollup/plugin-commonjs \
     # saves around 23MB
     && rm -rf /root/.npm
+
+COPY --chmod=777 extras.cli/docker-entrypoint.sh /docker-entrypoint.sh
 
 VOLUME ["/work/output", "/work/input"]
 WORKDIR /work
 
-ENTRYPOINT ["ergogen"]
-
-CMD ["/work/input/keyboard.yaml", "--clean", "--debug", "--output=/work/output"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
