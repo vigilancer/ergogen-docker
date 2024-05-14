@@ -69,7 +69,8 @@ But one can find other use for different scenarios for this tool.
 
   When multiple SOURCEs are specified they will be merged into single OUTPUT directory.
   In case of collision (two or more footprint files with same name) only one of them will be left in OUTPUT directory.
-  No guarantees are given on order of downloading SOURCES and as result on order of overriding files during collision.
+  No guarantees are given on order of downloading SOURCES and as result on order of overriding files during collision
+  other than vanilla official ergogen footprints will always be downloaded first (if --skip-vanilla was not specified).
 
   This tools is trying to be intelligent in interpretation of what SOURCE can possibly be.
   You can speficy following things as SOURCE:
