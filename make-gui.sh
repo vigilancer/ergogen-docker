@@ -50,14 +50,21 @@ ergogen_daemon() {
         ergogen-gui:latest
 }
 
+ergogen_update_footprints() {
+  docker exec -it ergogen-gui npm run build-ergogen
+}
+
 main() {
-    [ $# -eq 0 ] && err "available subcommands: build, run, daemon" 2
+    [ $# -eq 0 ] && err "available subcommands: build, run, daemon, sync" 2
 
     local cmd="$1"; shift
 
     case $cmd in
         "build" | "run" | "daemon")
         $"ergogen_$cmd" "$@"
+        ;;
+        "sync")
+        ergogen_update_footprints
         ;;
         *)
         err "command $cmd is not supported" 3
