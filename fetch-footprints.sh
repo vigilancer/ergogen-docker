@@ -23,7 +23,7 @@ $(basename "$0") -h
 
 $(basename "$0") -i DIR
 
-$(basename "$0") -o OUTOUT [--skip-vanilla] [--dont-clear] [SOURCE .. ]
+$(basename "$0") [-o OUTOUT] [--skip-vanilla] [--dont-clear] [SOURCE .. ]
 
 "
 
