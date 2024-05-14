@@ -196,6 +196,7 @@ do_process_source() {
   if [ -d "$src" ]; then
     cd "$src"
     cp *.js "$out/"
+    cd -
   else
     local src_arr=()
     IFS='#' read -ra src_arr <<< "$src"
@@ -216,6 +217,7 @@ do_process_source() {
 
       cd "$tmpdir/$path/" 
       cp *.js "$out/"
+      cd -
     fi
   fi
 
