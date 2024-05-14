@@ -21,6 +21,7 @@ err() {
 ergogen_build() {
     local target="${1:-run}"
     docker build \
+        --no-cache \
         --target "${target}"  \
         -t ergogen-gui:latest \
         -f Dockerfile.gui \
