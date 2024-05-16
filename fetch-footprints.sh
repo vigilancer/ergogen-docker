@@ -21,9 +21,9 @@ Fetches footprint files from different sources into one local directory.
 
 $(basename "$0") -h
 
-$(basename "$0") -i DIR
+$(basename "$0") -i [DIR]
 
-$(basename "$0") [-o OUTOUT] [--skip-vanilla] [--dont-clear] [SOURCE .. ]
+$(basename "$0") [-o OUTOUT] [--skip-vanilla] [--clear] [SOURCE .. ]
 
 "
 
@@ -50,21 +50,22 @@ But one can find other use for different scenarios for this tool.
                     Existing footprints inside DIR (non-recursive) will be used.
                     Resulting index.js will be created inside DIR.
                     Existing index.js will be overriden.
+                    When DIR is missing default 'footprints/' will be used.
 
   -o OUTPUT       - Where to place all downloaded footprints and resulting index.js.
                     index.js will be created afresh from all .js files in OUTPUT.
                     Existing index.js will be overriden.
                     If directory does not exists it will be created.
 
-  --dont-clear    - Do not clear OUTPUT dir before downloading footprints.
-                    By default we delete eve
+  --clear    - Clear OUTPUT dir before downloading footprints.
+                    By default if OUTPUT directory exists we stop.
 
   --skip-vanilla  - Do NOT download vanila footprints from ergogen repo.
                     By default vanilla footprints from ergogen repo will be downloaded without explicit request.
 
   SOURCE            List of sources where to acquire footprints.
                     If no SOURCE are specified only vanilla ergogen footprints will be downloaded.
-                    If no SOURCE are specified and --skip-vanilla is specified nothing will be downloaded and --dont-clear will be ignored.
+                    If no SOURCE are specified and --skip-vanilla is specified nothing will be downloaded and --clear will be ignored.
                     If no SOURCE are specified index.js will not be updated because vanilla footprints folder already contains valid one.
 
   When multiple SOURCEs are specified they will be merged into single OUTPUT directory.
@@ -152,7 +153,7 @@ do_error() {
 validate_args() {
   local output="$1"; shift
   local skip_vanilla="$1"; shift
-  local dont_clear="$1"; shift
+  local do_clear="$1"; shift
   local update_index_only="$1"; shift
   local sources=("$@")
 
@@ -168,21 +169,27 @@ validate_args() {
 
 do_update_index() {
   local dir="$1"
-  local index="$dir/index.js"
-  m "Updating index $index ..."
+  local index="index.js"
+  [ -d "$dir" ] || err "Directory "$dir" does not exist" 98
+  m "Updating index $dir/$index ..."
 
+  cd "$dir"
   [ -f "$index" ] && rm "$index"
 
   echo "module.exports = {" >> "$index"
 
-  for f in "$dir/"*; do
+  for f in $(find . -name "*.js"); do
+    echo $f
     [ -f "$f" ] || continue
-    local s=$(basename $f | perl -pe 's/.js$//')
-    [ "$s" != "index" ] || continue
-    echo "    $s: require('./$s')," >> "$index"
+    local mfile=$(echo $f | perl -pe 's/.js$//')
+    local mname=$(echo $mfile | perl -pe 's/^\.\///' | perl -pe 's/\//:/')
+
+    [ "$mfile" != "index" ] || continue
+    echo "    \"$mname\": require('$mfile')," >> "$index"
   done
 
   echo "}" >> "$index"
+  cd -
   m "Done updating"
 }
 
@@ -232,18 +239,25 @@ __process_git_src() {
 main() {
   local output="footprints"
   local skip_vanilla=0
-  local dont_clear=0
+  local do_clear=0
   local update_index_only=0
   local sources=( "https://github.com/ergogen/ergogen.git#src/footprints" )
 
   while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -i) update_index_only=1; output="$2"; shift ;;
+        -i) 
+        {
+          update_index_only=1; 
+          if [ $# -ge 2 ]; then
+            output="$2"
+            shift
+          fi
+        } ;;
         -h) echo "$usage"; exit 0;;
         --help) echo "$usage" echo "$help"; exit 0;;
         -o) output="$2"; shift ;;
         --skip-vanilla) skip_vanilla=1 ;;
-        --dont-clear) dont_clear=1 ;;
+        --clear) do_clear=1 ;;
         # *) do_error "Unknown parameter passed: $1" 127 ;;
         *) sources+=( "$1" ) ;;
     esac
@@ -255,11 +269,20 @@ main() {
   m ""
   local t=$([ $skip_vanilla -eq 1 ] && echo "True" || echo "False")
   m "Skipping vanilla: $t"
-  local t=$([ $dont_clear -eq 1 ] && echo "True" || echo "False")
-  m "Don't clear output dir: $t"
+  local t=$([ $do_clear -eq 1 ] && echo "True" || echo "False")
+  m "Clear output dir: $t"
   local t=$([ $update_index_only -eq 1 ] && echo "True" || echo "False" )
   m "Update index only: $t"
   m ""
+
+  if [ $update_index_only -eq 1 ]; then
+    do_update_index "$output"
+    exit 0
+  fi
+
+  if [ -d "$output" ] && [ $do_clear -eq 0 ]; then
+    err "Output $output already exists and no --clear provided. Exiting ..." 99
+  fi
 
   [ -d "$output" ] || {
     m "Creating $output ..."
@@ -269,7 +292,7 @@ main() {
 
   output=$(cd "$output"; pwd)
 
-  validate_args "$output" "$skip_vanilla" "$dont_clear" "$update_index_only" "${sources[@]}"
+  validate_args "$output" "$skip_vanilla" "$do_clear" "$update_index_only" "${sources[@]}"
 
   local tmp=()
   [ $skip_vanilla -eq 1 ] && tmp=${sources[@]:1}
@@ -283,12 +306,7 @@ main() {
   done
   m ""
 
-  if [ $update_index_only -eq 1 ]; then
-    do_update_index "$output"
-    exit 0
-  fi
-
-  if [ $dont_clear -eq 0 ]; then
+  if [ $do_clear -eq 1 ]; then
     m "Clearing output $output ..."
     rm -rf "$output/*"
     m "Done clearing"
