@@ -1,6 +1,6 @@
 
 __update_footprints() {
-  ./fetch-footprints.sh --skip-vanilla ../ergogen-footprints/vanilla/ ../ergogen-footprints/
+  ./fetch-footprints.sh ../ergogen-footprints/my/ ../ergogen-footprints/vanilla/ --clear
   ./make-gui.sh sync
 }
 
