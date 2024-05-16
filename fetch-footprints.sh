@@ -23,7 +23,7 @@ $(basename "$0") -h
 
 $(basename "$0") -i [DIR]
 
-$(basename "$0") [-o OUTOUT] [--skip-vanilla] [--clear] [SOURCE .. ]
+$(basename "$0") [-o OUTOUT] [--add-vanilla] [--clear] [SOURCE .. ]
 
 "
 
@@ -31,7 +31,7 @@ $(basename "$0") [-o OUTOUT] [--skip-vanilla] [--clear] [SOURCE .. ]
 help="
 
 Tool can fetch footprints from git repo, local directory or from official ergogen github repo.
-It will download vanilla footprints from ergogen repo unless --skip-vanulla is specified.
+It will download vanilla footprints from ergogen repo if --add-vanilla is specified.
 Also it will update index.js to include all acquired footprints.
 
 Original purpose of this tool was to simplify running ergogen in Docker when 'footprints' folder
@@ -60,18 +60,18 @@ But one can find other use for different scenarios for this tool.
   --clear    - Clear OUTPUT dir before downloading footprints.
                     By default if OUTPUT directory exists we stop.
 
-  --skip-vanilla  - Do NOT download vanila footprints from ergogen repo.
-                    By default vanilla footprints from ergogen repo will be downloaded without explicit request.
+  --add-vanilla  - Download vanila footprints from ergogen repo.
+                    By default vanilla footprints from ergogen repo will NOT be downloaded without explicit request.
 
   SOURCE            List of sources where to acquire footprints.
-                    If no SOURCE are specified only vanilla ergogen footprints will be downloaded.
-                    If no SOURCE are specified and --skip-vanilla is specified nothing will be downloaded and --clear will be ignored.
+                    If no SOURCE are specified and --add-vanilla not specified nothing will be downloaded and --clear will be ignored.
+                    If no SOURCE are specified and --add-vanilla is specified only vanilla ergogen footprints will be downloaded.
                     If no SOURCE are specified index.js will not be updated because vanilla footprints folder already contains valid one.
 
   When multiple SOURCEs are specified they will be merged into single OUTPUT directory.
   In case of collision (two or more footprint files with same name) only one of them will be left in OUTPUT directory.
   No guarantees are given on order of downloading SOURCES and as result on order of overriding files during collision
-  other than vanilla official ergogen footprints will always be downloaded first (if --skip-vanilla was not specified).
+  other than vanilla official ergogen footprints will always be downloaded first (if --add-vanilla was  specified).
 
   This tools is trying to be intelligent in interpretation of what SOURCE can possibly be.
   You can speficy following things as SOURCE:
@@ -100,17 +100,17 @@ But one can find other use for different scenarios for this tool.
   $(basename "$0")
   
 
-  Download vanilla footprints (index.js will be downloaded from ergogen repo and will not be generated):
-
-  $(basename "$0") -o ./footprints
-
-
   Use only locally stored footprints:
 
-  $(basename "$0") -o ./footprints --skip-vanilla SOME_DIR_WITH_FOOTPRINTS/
+  $(basename "$0") -o ./footprints SOME_DIR_WITH_FOOTPRINTS/
 
 
-  Download external footprints from github (extra footprints will be downloaded alongside with vanilla footprints):
+  Download vanilla footprints (index.js will be downloaded from ergogen repo and will not be generated):
+
+  $(basename "$0") -o ./footprints --add-vanilla 
+
+
+  Download external footprints from github:
 
   $(basename "$0") -o ./footprints "https://github.com/ceoloide/ergogen-footprints.git"
 
@@ -152,7 +152,7 @@ do_error() {
 
 validate_args() {
   local output="$1"; shift
-  local skip_vanilla="$1"; shift
+  local add_vanilla="$1"; shift
   local do_clear="$1"; shift
   local update_index_only="$1"; shift
   local sources=("$@")
@@ -238,10 +238,10 @@ __process_git_src() {
 
 main() {
   local output="footprints"
-  local skip_vanilla=0
+  local add_vanilla=0
   local do_clear=0
   local update_index_only=0
-  local sources=( "https://github.com/ergogen/ergogen.git#src/footprints" )
+  local sources=()
 
   while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -256,7 +256,7 @@ main() {
         -h) echo "$usage"; exit 0;;
         --help) echo "$usage" echo "$help"; exit 0;;
         -o) output="$2"; shift ;;
-        --skip-vanilla) skip_vanilla=1 ;;
+        --add-vanilla) add_vanilla=1 ;;
         --clear) do_clear=1 ;;
         # *) do_error "Unknown parameter passed: $1" 127 ;;
         *) sources+=( "$1" ) ;;
@@ -267,8 +267,8 @@ main() {
   m ""
   m "Output dir: $output"
   m ""
-  local t=$([ $skip_vanilla -eq 1 ] && echo "True" || echo "False")
-  m "Skipping vanilla: $t"
+  local t=$([ $add_vanilla -eq 1 ] && echo "True" || echo "False")
+  m "Adding vanilla: $t"
   local t=$([ $do_clear -eq 1 ] && echo "True" || echo "False")
   m "Clear output dir: $t"
   local t=$([ $update_index_only -eq 1 ] && echo "True" || echo "False" )
@@ -278,6 +278,12 @@ main() {
   if [ $update_index_only -eq 1 ]; then
     do_update_index "$output"
     exit 0
+  fi
+
+  if [ $add_vanilla -eq 1 ]; then
+    local tmp=( "https://github.com/ergogen/ergogen.git#src/footprints" )
+    tmp += "${sources[@]}"
+    sources=($tmp)
   fi
 
   if [ -d "$output" ] && [ $do_clear -eq 0 ]; then
@@ -292,12 +298,7 @@ main() {
 
   output=$(cd "$output"; pwd)
 
-  validate_args "$output" "$skip_vanilla" "$do_clear" "$update_index_only" "${sources[@]}"
-
-  local tmp=()
-  [ $skip_vanilla -eq 1 ] && tmp=${sources[@]:1}
-  [ $skip_vanilla -eq 0 ] && tmp=${sources[@]}
-  sources=($tmp)
+  validate_args "$output" "$add_vanilla" "$do_clear" "$update_index_only" "${sources[@]}"
 
   m ""
   m "Using these sources:"
@@ -318,12 +319,12 @@ main() {
 
   # update indexes if one of these is true:
   # (both conditions make sure that at least one custom source is specified)
-  # = --skip-vanilla and size(sources) > 0
-  # = no --skip-vanilla and size(sources) > 1
-  if [ $skip_vanilla -eq 1 ] && [ ${#sources[@]} -gt 0 ]; then
+  # = --add-vanilla and size(sources) > 1
+  # = no --add-vanilla and size(sources) > 0
+  if [ $add_vanilla -eq 1 ] && [ ${#sources[@]} -gt 1 ]; then
     do_update_index "$output"
   fi
-  if [ $skip_vanilla -eq 0 ] && [ ${#sources[@]} -gt 1 ]; then
+  if [ $add_vanilla -eq 0 ] && [ ${#sources[@]} -gt 0 ]; then
     do_update_index "$output"
   fi
 
