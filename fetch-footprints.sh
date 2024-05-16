@@ -197,12 +197,14 @@ do_process_source() {
   local src="$1"; shift
   local out="$1"; shift
 
+  out=$(cd "$out"; pwd)
   m "Processing $src into $out ..."
 
   # process local dir
   if [ -d "$src" ]; then
+    src=$(cd $src; pwd)
     cd "$src"
-    cp *.js "$out/"
+    find . -name "*.js" | cpio -p -dumv "$out/"
     cd -
   else
     local src_arr=()
@@ -309,7 +311,7 @@ main() {
 
   if [ $do_clear -eq 1 ]; then
     m "Clearing output $output ..."
-    rm -rf "$output/*"
+    rm -rf "$output/"*
     m "Done clearing"
   fi
 
