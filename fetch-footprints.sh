@@ -3,17 +3,6 @@
 [ -z $DEBUG ] || set -x
 set -eu -o pipefail
 
-finish_abnormal() {
-  :
-}
-
-finish_normal() {
-  :
-}
-
-trap finish_abnormal INT TERM
-trap finish_normal EXIT
-
 usage="
 
 Footprints downloader.
