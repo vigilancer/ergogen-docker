@@ -117,6 +117,7 @@ When working with ergogen-gui you need to run `./make-gui.sh sync` every time yo
 #### ergogen
 
 ```sh
+git clone https://github.com/vigilancer/ergogen-docker.git && cd ergogen-docker
 mkdir input/ output/
 ./fetch-footprints.sh --add-vanilla
 cp PATHTO/your-awesome-keyboard-layout.yaml input/keyboard.yaml
@@ -128,13 +129,14 @@ find output/
 #### ergogen-gui
 
 ```sh
+git clone https://github.com/vigilancer/ergogen-docker.git && cd ergogen-docker
 ./fetch-footprints.sh --add-vanilla
 ./make-gui.sh build
 ./make-gui.sh daemon
 open localhost:3000
 ```
 
-Every time `footprints` folder is changed run:
+Every time `footprints` folder is changed (relevant to ergogen-gui only!) run:
 
 ```sh
 ./make-gui.sh sync
