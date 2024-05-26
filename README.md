@@ -1,7 +1,3 @@
-
-Run ergogen and ergogen-gui locally with custom footprints.
-
-
 ### Description
 
 Goal of this project is to simplify usage of ergogen and ergogen-gui with custom footprints.
