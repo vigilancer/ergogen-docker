@@ -48,8 +48,6 @@ cp PATHTO/your-awesome-keyboard-layout.yaml input/keyboard.yaml
 
 This should speed up keyboard development a bit.
 
-With some shell magik you can re-open KiCAD with fresh scheme on every change in `keyboard.yaml`.
-
 `./make-cli.sh build` will build Docker image.
 
 `./make-cli.sh run` will generate keyboard files from ergogen's keyboard description. 
@@ -65,6 +63,8 @@ For example, `./make-cli.sh run -h` is identical to running `ergogen -h` and wil
 `./make-cli.sh` will take care of lots of stuff for you,
 in particular it will mount all required folders and rebuild ergogen inside docker image to accommodate all changes in `footprints/` folder
 so any new or changed footprints will be in effect on every ergogen invocation.
+
+And with some shell magik you can re-open KiCAD with fresh scheme on every change in `keyboard.yaml`.
 
 
 #### Run ergogen-gui locally in Docker
