@@ -1,11 +1,11 @@
 
 __update_footprints_gui() {
-  ./fetch-footprints.sh ../ergogen-footprints/my/ ../ergogen-footprints/vanilla/ --clear
+  ./fetch-footprints.sh ../footprints/my/ ../footprints/vanilla/ --clear
   ./make-gui.sh sync
 }
 
 __generate_pcb() {
-  ./fetch-footprints.sh ../ergogen-footprints/my/ ../ergogen-footprints/vanilla/ --clear && \
+  ./fetch-footprints.sh ../footprints/my/ ../footprints/vanilla/ --clear && \
 
   ./make-cli.sh run && \
 
