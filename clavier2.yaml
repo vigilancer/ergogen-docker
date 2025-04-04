@@ -1,0 +1,438 @@
+meta:
+  engine: 4.1.0
+units:
+  # Choc V1 physical dimentions
+  cdx: 15
+  cdy: 15
+
+  # Choc V1 footprint size
+  # adds 1mm around physical key
+  cfx: cdx + 1
+  cfy: cfx
+  cu: cfx  # cfx == cfy == cu
+  
+  # offset for board outline
+  px: cu + 7  #-0.5
+  py: cu + 7  #-0.5
+
+  # thumbs block offest below main keys
+  tyoff: 0.2cu
+
+points:
+  zones:
+    matrix:
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+      rotate: -20  # 20*2=40 between two halves
+      anchor:
+        # Center on KiCad sheet
+        shift: [100, -130]
+      key:
+        tags: ["buttons"]
+        padding: 1cu
+        spread: 1cu
+      columns:
+        c1:
+          key:
+            column_net: NC1
+            mirror.column_net: NC18
+          rows:
+            r5.skip: true
+            r4:
+              row_net: NR4
+            r3:
+              row_net: NR3
+            r2:
+              row_net: NR2
+        c2:
+          key:
+            column_net: NC2
+            mirror.column_net: NC17
+          rows:
+            r5.skip: true
+            r4:
+              row_net: NR4
+            r3:
+              row_net: NR3
+            r2:
+              row_net: NR2
+        c3:
+          key:
+            column_net: NC3
+            mirror.column_net: NC16
+          rows:
+            r5.skip: true
+            r4:
+              row_net: NR4
+            r3:
+              row_net: NR3
+            r2:
+              row_net: NR2
+        c4:
+          key:
+            column_net: NC4
+            mirror.column_net: NC15
+          rows:
+            r5:
+              row_net: NR5
+            r4:
+              row_net: NR4
+            r3:
+              row_net: NR3
+            r2:
+              row_net: NR2
+        c5:
+          key:
+            column_net: NC5
+            mirror.column_net: NC14
+          rows:
+            r5:
+              row_net: NR5
+            r4:
+              row_net: NR4
+            r3:
+              row_net: NR3
+            r2:
+              row_net: NR2
+          key.stagger: 0.5cu
+        c6:
+          key:
+            column_net: NC6
+            mirror.column_net: NC13
+          rows:
+            r5.skip: true
+            r4:
+              row_net: NR4
+            r3:
+              row_net: NR3
+            r2:
+              row_net: NR2
+          key.stagger: 0.5cu
+        c7:
+          key:
+            column_net: NC7
+            mirror.column_net: NC12
+          rows:
+            r5.skip: true
+            r4:
+              row_net: NR4
+            r3:
+              row_net: NR3
+            r2:
+              row_net: NR2
+        c8:
+          key:
+            column_net: NC8
+            mirror.column_net: NC11
+          rows:
+            r5.skip: true
+            r4:
+              row_net: NR4
+            r3:
+              row_net: NR3
+            r2:
+              row_net: NR2
+      rows:
+        r2:
+        r3:
+        r4:
+        r5:
+    nums:
+      rotate: 20
+      anchor:
+        ref: matrix_c2_r4
+        shift: [-2cu, -0.3cu]
+      key:
+        padding: 1cu
+        spread: 1cu
+        tags: ["buttons"]
+      columns:
+        c3.rows.r6:
+          column_net: NC3
+          mirror.column_net: NC16
+          row_net: NR7
+        c4.rows.r6:
+          column_net: NC4
+          mirror.column_net: NC15
+          row_net: NR7
+        c5.rows.r6:
+          column_net: NC5
+          mirror.column_net: NC14
+          row_net: NR7
+        c6.rows.r6:
+          column_net: NC6
+          mirror.column_net: NC13
+          row_net: NR7
+        c7.rows.r6:
+          column_net: NC7
+          mirror.column_net: NC12
+          row_net: NR7
+        c8.rows.r6:
+          column_net: NC8
+          mirror.column_net: NC11
+          row_net: NR7
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+    fn2:
+      anchor:
+        ref: nums_c3_r6
+        shift: [0, 1.1cu]
+      key:
+        padding: 1cu
+        spread: 1cu
+        tags: ["buttons"]
+      columns:
+        c3.rows.r7:
+          column_net: NC3
+          mirror.column_net: NC16
+          row_net: NR8
+        c4.rows.r7:
+          column_net: NC4
+          mirror.column_net: NC15
+          row_net: NR8
+        c5.rows.r7:
+          column_net: NC5
+          mirror.column_net: NC14
+          row_net: NR8
+        c6.rows.r7:
+          column_net: NC6
+          mirror.column_net: NC13
+          row_net: NR8
+        c7.rows.r7:
+          column_net: NC7
+          mirror.column_net: NC12
+          row_net: NR8
+        c8.rows.r7:
+          column_net: NC8
+          mirror.column_net: NC11
+          row_net: NR8
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+    fn1:
+      anchor:
+        ref: fn2_c3_r7
+        shift: [0, 1cu]
+      key:
+        padding: 1cu
+        spread: 1cu
+        tags: ["buttons"]
+      columns:
+        c3.rows.r8:
+          column_net: NC3
+          mirror.column_net: NC16
+          row_net: NR8
+        c4.rows.r8:
+          column_net: NC4
+          mirror.column_net: NC15
+          row_net: NR8
+        c5.rows.r8:
+          column_net: NC5
+          mirror.column_net: NC14
+          row_net: NR8
+        c6.rows.r8:
+          column_net: NC6
+          mirror.column_net: NC13
+          row_net: NR8
+        c7.rows.r8:
+          column_net: NC7
+          mirror.column_net: NC12
+          row_net: NR8
+        c8.rows.r8:
+          column_net: NC8
+          mirror.column_net: NC11
+          row_net: NR8
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+    thumbs_center:
+      key.tags: ["buttons"]
+      anchor:
+        ref: matrix_c7_r2
+        shift: [0.3cu, -1*(1.1cu + tyoff)]
+      columns:
+        c7.rows.r1:
+          column_net: NC7
+          mirror.column_net: NC12
+          row_net: NR1
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+    thumbs_t2:
+      key.tags: ["buttons"]
+      anchor:
+        ref: matrix_c6_r2
+        shift: [0.15cu, -1*(1cu + tyoff)]
+      columns:
+        c6:
+          key.splay: 15
+          key.origin: [cu/2, 0]
+        c6.rows.r1:
+          column_net: NC6
+          mirror.column_net: NC13
+          row_net: NR1
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+    thumbs_t1:
+      key.tags: ["buttons"]
+      anchor:
+        ref: matrix_c5_r2
+        shift: [0.15cu, -1*(1cu + tyoff)]
+      columns:
+        c5:
+          key.splay: 25
+          key.origin: [0, 0]
+        c5.rows.r1:
+          column_net: NC5
+          mirror.column_net: NC14
+          row_net: NR1
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+    thumbs_t4:
+      key.tags: ["buttons"]
+      anchor:
+        ref: thumbs_center_c7_r1
+        shift: [0.9cu,-1cu]
+      columns:
+        c8:
+          key.origin: [cu/2,0]
+          key.splay: -30
+        c8.rows.r1:
+          column_net: NC8
+          mirror.column_net: NC11
+          row_net: NR1
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+    thumbs_t5:
+      key.tags: ["buttons"]
+      anchor:
+        ref: thumbs_center_c7_r1
+        shift: [1.5cu,-2cu]
+      columns:
+        c9:
+          key.origin: [cu/2,0]
+          key.splay: -45
+        c9.rows.r1:
+          column_net: NC9
+          mirror.column_net: NC10
+          row_net: NR1
+      mirror:
+        ref: matrix_c7_r4
+        distance: 100  # 10cm
+    leds:
+      rotate: 20
+      key:
+        tags: ["leds"]
+        spread: 0.25u
+      anchor:
+        ref: matrix_c7_r5
+        shift: [-0.3u, -4cu]
+      columns:
+        c1.rows.r1:
+          di: L21
+        c2.rows.r1:
+          di: L32
+          do: L21
+        c3.rows.r1:
+          di: L43
+          do: L32
+        c4.rows.r1:
+          di: L54
+          do: L43
+        c5.rows.r1:
+          di: C13
+          do: L54
+
+outlines:
+  raw:
+    - what: rectangle
+      where: true
+      size: [cfx, cfy]
+  keys:
+    - what: rectangle
+      where: true
+      operation: stack
+      size: [cu-0.5, cu-0.5]
+  board:
+    - what: polygon
+      operation: stack
+      fillet: 2
+      points:
+        - ref: thumbs_t5_c9_r1
+          shift: [+0.5px, -0.5px]
+        - ref: thumbs_t1_c5_r1
+          shift: [-0.5px, -0.5px]
+        - ref: matrix_c4_r2
+          shift: [-0.5px, -0.5px]
+        - ref: matrix_c1_r2
+          shift: [-0.5px, -0.5px]
+        - ref: matrix_c1_r4
+          shift: [-0.5px, +0.5px]
+        - ref: fn1_c3_r8
+          shift: [-0.6px, +0.7px]
+        - ref: mirror_fn1_c3_r8
+          shift: [-0.6px, +0.7px]
+        - ref: mirror_matrix_c1_r4
+          shift: [-0.5px, +0.5px]
+        - ref: mirror_matrix_c1_r2
+          shift: [-0.5px, -0.5px]
+        - ref: mirror_matrix_c4_r2
+          shift: [-0.5px, -0.5px]
+        - ref: mirror_thumbs_t1_c5_r1
+          shift: [-0.5px, -0.5px]
+        - ref: mirror_thumbs_t5_c9_r1
+          shift: [+0.5px, -0.5px]
+  combo:
+    - name: board
+    - operation: subtract
+      name: keys
+pcbs:
+  clavier:
+    template: kicad8
+    outlines:
+      main:
+        outline: board
+    footprints:
+      chocV1:
+        what: ae:switch_choc_v1_v2
+        where: meta.tags ~ buttons
+        params:
+          from: "{{column_net}}"
+          to: "{{colrow}}"
+          hotswap: false
+          solder: true
+          choc_v2_support: false
+          include_corner_marks: true
+          ref_show: false
+      diode:
+        what: ae:sod123f
+        where: meta.tags ~ buttons
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+          side: 'B'
+        adjust:
+          shift: [3, -4.5]
+          rotate: 90
+          resist: true
+      mcu:
+        what: ae:blackpill
+        where:
+          ref.aggregate.parts: [fn1_c8_r8, mirror_fn1_c8_r8]
+        adjust:
+          shift: [0, -1cu]
+      rgb:
+        what: ae:ws2812_2020
+        where: meta.tags ~ leds
+        params:
+          dout: "{{do}}"
+          din: "{{di}}"
+        adjust:
+          shift: [0, 0]
+          rotate: -90
+
