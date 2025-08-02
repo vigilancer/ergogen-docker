@@ -13,7 +13,8 @@ __generate_pcb() {
 }
 
 __watch_and_gen_pcb() {
-  find input/ | entr -p bash -c "pkill pcbnew; source env.sh && __generate_pcb"
+  find input/ | entr -p bash -c "source env.sh && __generate_pcb"
+  # find input/ | entr -p bash -c "pkill pcbnew; source env.sh && __generate_pcb"
 }
 
 
